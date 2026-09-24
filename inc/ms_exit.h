@@ -1,0 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exit.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: stmuller <stmuller@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/27 23:17:15 by stmuller          #+#    #+#             */
+/*   Updated: 2026/08/27 23:19:10 by stmuller         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef MS_EXIT_H
+# define MS_EXIT_H
+# define MS_MEM_ERR "malloc failed"
+
+void	ms_exit(int exit_code);
+
+void	ms_complain(char *msg, int error_code);
+
+void	ms_error_out(int exit_code, char *msg, int error_code);
+
+// ms_exit_if(ft_malloc(size), "malloc failed");
+void	*ms_exit_if(void *cond, char *error_msg);
+
+// exit clean with memory allocation error if cond is NULL,
+//	otherwise return cond
+void	*ms_protect(void *cond);
+
+void	ms_signal_exit(int sig);
+#endif

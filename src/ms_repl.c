@@ -1,0 +1,74 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_repl.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: stmuller <stmuller@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/27 23:17:15 by stmuller          #+#    #+#             */
+/*   Updated: 2026/08/27 23:19:10 by stmuller         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ms_env.h"
+#include "ms_exec.h"
+#include "ms_exit.h"
+#include "ms_parsing.h"
+#include "ms_repl.h"
+#include "ms_rl_hooks.h"
+#include "ms_signal.h"
+#include <libft_io.h>
+
+static char	*ms_cut_nl(char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s != NULL && s[i] != '\0')
+	{
+		if (s[i] == '\n' && s[i + 1] == '\0')
+			s[i] = '\0';
+		i++;
+	}
+	return (s);
+}
+
+char	*ms_repl_readline(t_ms_repl_prompt_get prompt_getter,
+		int (*ms_rl_hook)(void))
+{
+	char	*line;
+
+	if (!isatty(STDIN_FILENO))
+		return (ms_cut_nl(ft_gnl(STDIN_FILENO)));
+	line = ms_repl_rl_wrapper(prompt_getter(), ms_rl_hook);
+	return (line);
+}
+
+t_byte	ms_repl(void)
+{
+	char			*line;
+	t_ms_parse_res	*parsing_result;
+
+	while (true)
+	{
+		ms_signal_listen(0);
+		line = ms_repl_readline(ms_repl_prompt_shell, ms_rl_main_event_hook);
+		if (line == NULL)
+			break ;
+		ms_repl_history_add(line);
+		parsing_result = ms_parse(line);
+		if (parsing_result->exit_code == 0)
+			ms_exec(parsing_result->source.cmds);
+		else
+		{
+			ft_printf_fd(STDERR_FILENO, "minishell: %s\n",
+				parsing_result->source.error_msg);
+			if (!isatty(STDIN_FILENO))
+				ms_exit(parsing_result->exit_code);
+			else
+				ms_env_set_status(parsing_result->exit_code);
+		}
+		ms_free_parser_result(parsing_result, line);
+	}
+	return (ms_env_get_status());
+}

@@ -1,0 +1,68 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exec_builtins_export.c                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: stmuller <stmuller@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/27 23:17:15 by stmuller          #+#    #+#             */
+/*   Updated: 2026/08/27 23:19:10 by stmuller         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ms_env.h"
+#include "ms_exit.h"
+#include "ms_parsing_getlen.h"
+#include "ms_safe.h"
+#include <libft_arr.h>
+#include <libft_io.h>
+#include <libft_mem.h>
+#include <libft_str.h>
+
+t_byte	import_var(char *arg)
+{
+	size_t	var_name_len;
+	char	*var_name;
+
+	var_name_len = ms_parsing_varname(arg);
+	if (var_name_len == 0 || arg[0] == '?'
+		|| (arg[var_name_len] != '=' && arg[var_name_len] != '\0'))
+	{
+		var_name = ms_protect(ft_strf("export: `%s': not a valid identifier",
+					arg));
+		ms_complain(var_name, 0);
+		ft_free(var_name);
+		return (1);
+	}
+	if (arg[var_name_len] == '=')
+		var_name = ms_substr(arg, 0, var_name_len);
+	else
+		var_name = ms_substr(arg, 0, var_name_len);
+	if (arg[var_name_len] == '\0')
+		ms_env_touch(var_name);
+	else
+		ms_env_set(var_name, &arg[var_name_len + 1]);
+	ft_free(var_name);
+	return (0);
+}
+
+// return true if importing worked
+t_byte	import_vars(char **arg)
+{
+	if (*arg == NULL)
+		return (0);
+	return (import_var(*arg) | import_vars(arg + 1));
+}
+
+void	print_export(char *name, char *key)
+{
+	if (!ft_str_eq(name, "?"))
+		ft_printf("export '%s=%s'\n", name, key);
+}
+
+t_byte	ms_exec_builtin_export(char **argv)
+{
+	if (ft_arr_len((t_arr)argv) < 2)
+		return (ms_env_each(print_export), 0);
+	return (import_vars(argv + 1));
+}

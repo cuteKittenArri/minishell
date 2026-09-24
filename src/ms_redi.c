@@ -1,0 +1,53 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redi.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: stmuller <stmuller@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/27 23:17:15 by stmuller          #+#    #+#             */
+/*   Updated: 2026/08/27 23:19:10 by stmuller         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ms_redi.h"
+#include "ms_safe.h"
+#include <libft_mem.h>
+
+void	ms_redi_turnoff(t_ms_redi *redi)
+{
+	if (redi == NULL || redi->kind == REDI_INVALID)
+		return ;
+	if (redi->source_kind == REDI_SOURCE_PATH)
+		redi->source.path = (ft_free(redi->source.path), NULL);
+	if (redi->source_kind == REDI_SOURCE_FD && redi->source.fd >= 0)
+		redi->source.fd = (ms_close(redi->source.fd), -1);
+	redi->kind = REDI_INVALID;
+}
+
+// do we also want to close the fds with that? probably, right?
+void	ms_redi_free(t_ms_redi *redi)
+{
+	if (redi == NULL)
+		return ;
+	ms_redi_turnoff(redi);
+	ft_free(redi);
+}
+
+void	ms_redi_set_path(t_ms_redi *r, char *path)
+{
+	if (r == NULL)
+		return ;
+	ms_redi_turnoff(r);
+	r->source_kind = REDI_SOURCE_PATH;
+	r->source.path = path;
+}
+
+void	ms_redi_set_fd(t_ms_redi *r, int fd)
+{
+	if (r == NULL)
+		return ;
+	ms_redi_turnoff(r);
+	r->source_kind = REDI_SOURCE_FD;
+	r->source.fd = fd;
+}

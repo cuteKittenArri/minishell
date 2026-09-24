@@ -1,0 +1,89 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_substr.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fkruger <fkruger@student.42vienna.com      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/17 08:31:03 by fkruger           #+#    #+#             */
+/*   Updated: 2026/02/13 18:39:07 by fkruger          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+#include "libft_mem.h"
+#include "libft_str.h"
+#include <stddef.h>
+
+// requires input to have strlen of at least n
+static char	*ft_first_n_chars(const char *input, size_t n)
+{
+	char	*result;
+
+	result = ft_str_alloc(n);
+	return (ft_memcpy(result, input, n));
+}
+
+char	*ft_substr(const char *s, size_t start, size_t len)
+{
+	size_t	input_len;
+
+	if (s == NULL)
+		return (NULL);
+	input_len = ft_strlen(s);
+	if (start > input_len)
+		return (ft_strdup(""));
+	if (start + len > input_len)
+		return (ft_strdup(s + start));
+	return (ft_first_n_chars(s + start, len));
+}
+/*
+{
+	char	*wip;
+	char	*result;
+
+	wip = ft_strdup(s);
+	if (!wip)
+		return (NULL);
+	if (ft_strlen(wip) <= start)
+		return (ft_free(wip), ft_strdup(""));
+	if (ft_strlen(wip) > start + len)
+		wip[start + len] = '\0';
+	result = ft_strdup(wip + start);
+	ft_free(wip);
+	return (result);
+} */
+
+/*
+// returns the size of the substring
+static size_t	ft_substr_len(const char *s, size_t start, size_t len)
+{
+	size_t	s_len;
+
+	s_len = ft_strlen(s);
+	if (start > s_len)
+		return (0);
+	if ((start + len) > s_len)
+		return (s_len - start);
+	return (len);
+}
+
+
+
+char	*ft_substr(const char *s, size_t start, size_t len)
+{
+	char	*result;
+	size_t	i;
+	size_t	output_len;
+
+	i = 0;
+	output_len = ft_substr_len(s, start, len);
+	if (output_len == 0)
+		return (ft_calloc(1, sizeof(char)));
+	result = ft_calloc(output_len + 1, sizeof(char));
+	while (result != NULL && *(s + start + i) && i < len)
+	{
+		*(result + i) = *(s + start + i);
+		i++;
+	}
+	return (result);
+}
+*/
