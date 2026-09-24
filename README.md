@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by fkruger and stmuller.*
+*This project has been created as part of the 42 curriculum by [fkruger](https://github.com/iggi42) and [stmuller](https://github.com/cuteKittenArri).*
 
 # minishell
 
